@@ -197,8 +197,7 @@ dmypy.json
 
 # End of https://www.gitignore.io/api/python,pycharm
 
-# Removed from .gitignore to add it to repo
-# config.json 
 venv
 .idea/
 debug.log
+config.json

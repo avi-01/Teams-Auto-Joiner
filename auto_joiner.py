@@ -189,7 +189,7 @@ def init_browser():
         browser.set_window_size(window_size['width'], 850)
 
 
-def wait_until_found(sel, timeout, print_error=True):
+def wait_until_found(sel, timeout = 30, print_error=True):
     try:
         element_present = EC.visibility_of_element_located((By.CSS_SELECTOR, sel))
         WebDriverWait(browser, timeout).until(element_present)
@@ -379,13 +379,13 @@ def join_meeting(meeting):
 
     if meeting.calendar_meeting:
         switch_to_calendar_tab()
-        join_btn = wait_until_found(f"div[id='{meeting.m_id}'] > div > button", 5)
+        join_btn = wait_until_found(f"div[id='{meeting.m_id}'] > div > button", 30)
 
     else:
         browser.execute_script(f'window.location = "{conversation_link}a?threadId={meeting.channel_id}&ctx=channel";')
         switch_to_teams_tab()
 
-        join_btn = wait_until_found(f"div[id='{meeting.m_id}'] > calling-join-button > button", 5)
+        join_btn = wait_until_found(f"div[id='{meeting.m_id}'] > calling-join-button > button", 30)
 
     if join_btn is None:
         return
