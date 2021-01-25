@@ -470,11 +470,17 @@ def get_meeting_members():
         attendees = [int(s) for s in attendees_elem.get_attribute("aria-label").split() if s.isdigit()]
     else:
         attendees = 0
+    
+    try:
+        browser.execute_script("document.getElementById('roster-button').click()")
+    except exceptions.JavascriptException:
+        print("Failed to close the participants sidebar")
+        return None
 
-    if mode != 3:
-        switch_to_teams_tab()
-    else:
-        switch_to_calendar_tab()
+    # if mode != 3:
+    #     switch_to_teams_tab()
+    # else:
+    #     switch_to_calendar_tab()
 
     return sum(participants + attendees)
 
@@ -649,10 +655,11 @@ def main():
             if members_count and members_count > total_members:
                 total_members = members_count
 
-        if "leave_if_last" in config and config['leave_if_last'] and interval_count % 5 == 0 and interval_count > 0:
+        if "leave_if_last" in config and config['leave_if_last'] and interval_count > 0:
             if current_meeting is not None and members_count is not None and total_members is not None:
                 if handleLeaveThreshold(members_count, total_members):
                     total_members = None
+
                 
         interval_count += 1
 
