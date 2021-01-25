@@ -1,0 +1,37 @@
+{
+  "email": "",
+  "password": "",
+
+  "run_at_time": "",
+
+  "meeting_mode": 2,
+  "organisation_num" : 1,
+  "random_delay": true,
+  "check_interval": 120,
+
+  "auto_leave_after_min": -1,
+  "leave_if_last": true,
+  "leave_threshold_number": "30",
+  "leave_threshold_percentage": "50",
+  "pause_search": true,
+
+  "headless" : false,
+  "mute_audio": false,
+  "chrome_type": "google-chrome",
+
+  "blacklist": [
+    {
+      "team_name": "BE CSE and IT",
+      "channel_names": [
+        "General"
+      ]
+    },
+    {
+      "team_name": "ACM_DSW Website Design",
+      "channel_names": [
+        "General"
+      ]
+    }
+  ],
+  "blacklist_meeting_re": ""
+}
