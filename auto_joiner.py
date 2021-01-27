@@ -129,7 +129,7 @@ class Meeting:
 
 def load_config():
     global config
-    with open('config.json') as json_data_file:
+    with open('configuration.json') as json_data_file:
         config = json.load(json_data_file)
 
 
@@ -202,26 +202,26 @@ def wait_until_found(sel, timeout = 30, print_error=True):
 
 
 def switch_to_teams_tab():
-    teams_button = wait_until_found("button.app-bar-link > ng-include > svg.icons-teams", 5)
+    teams_button = wait_until_found("button.app-bar-link > ng-include > svg.icons-teams")
     if teams_button is not None:
         teams_button.click()
 
 
 def switch_to_calendar_tab():
-    calendar_button = wait_until_found("button.app-bar-link > ng-include > svg.icons-calendar", 5)
+    calendar_button = wait_until_found("button.app-bar-link > ng-include > svg.icons-calendar")
     if calendar_button is not None:
         calendar_button.click()
 
 
 def change_organisation(org_num):
-    select_change_org = wait_until_found("button.tenant-switcher", 20)
+    select_change_org = wait_until_found("button.tenant-switcher")
     if select_change_org is None:
         print("Something went wrong while changing the organisation")
         return
 
     select_change_org.click()
 
-    change_org = wait_until_found(f"li.tenant-option[aria-posinset='{org_num}']", 20)
+    change_org = wait_until_found(f"li.tenant-option[aria-posinset='{org_num}']")
     if change_org is None:
         print("Something went wrong while changing the organisation")
         return
@@ -229,7 +229,7 @@ def change_organisation(org_num):
     change_org.click()
     time.sleep(5)
 
-    use_web_instead = wait_until_found(".use-app-lnk", 5, print_error=False)
+    use_web_instead = wait_until_found(".use-app-lnk", print_error=False)
     if use_web_instead is not None:
         use_web_instead.click()
 
@@ -245,7 +245,7 @@ def prepare_page(include_calendar):
     if include_calendar:
         switch_to_calendar_tab()
 
-        view_switcher = wait_until_found(".ms-CommandBar-secondaryCommand > div > button[class*='__topBarContent']", 5)
+        view_switcher = wait_until_found(".ms-CommandBar-secondaryCommand > div > button[class*='__topBarContent']")
 
         if view_switcher is not None:
             try:
@@ -294,7 +294,7 @@ def get_meetings(teams):
                 browser.execute_script(f'window.location = "{conversation_link}a?threadId={channel.c_id}&ctx=channel";')
                 switch_to_teams_tab()
 
-                meeting_elem = wait_until_found(".ts-calling-thread-header", 10)
+                meeting_elem = wait_until_found(".ts-calling-thread-header")
                 if meeting_elem is None:
                     continue
                 meeting_elems = browser.find_elements_by_css_selector(".ts-calling-thread-header")
@@ -315,7 +315,7 @@ def get_meetings(teams):
 def get_calendar_meetings():
     global meetings
 
-    if wait_until_found("div[class*='__cardHolder']", 20) is None:
+    if wait_until_found("div[class*='__cardHolder']") is None:
         return
 
     join_buttons = browser.find_elements_by_css_selector("button[class*='__joinButton'], button[class*='__activeCall']")
@@ -392,7 +392,7 @@ def join_meeting(meeting):
 
     browser.execute_script("arguments[0].click()", join_btn)
 
-    join_now_btn = wait_until_found("button[data-tid='prejoin-join-button']", 30)
+    join_now_btn = wait_until_found("button[data-tid='prejoin-join-button']")
     if join_now_btn is None:
         return
 
@@ -421,7 +421,7 @@ def join_meeting(meeting):
         time.sleep(delay)
 
     # find again to avoid stale element exception
-    join_now_btn = wait_until_found("button[data-tid='prejoin-join-button']", 5)
+    join_now_btn = wait_until_found("button[data-tid='prejoin-join-button']")
     if join_now_btn is None:
         return
     join_now_btn.click()
@@ -491,8 +491,7 @@ def hangup():
         return
 
     try:
-        hangup_btn = browser.find_element_by_css_selector("button[data-tid='call-hangup']")
-        hangup_btn.click()
+        browser.execute_script("document.getElementById('hangup-button').click()")
 
         print(f"Left Meeting: {current_meeting.title}")
 
@@ -517,23 +516,17 @@ def handleLeaveThreshold(current_members, total_members):
             print("Last attendee in meeting")
             hangup()
             return True
-    if leave_number != "":
-        if float(leave_number) <= 0:
-            print(leave_number+" is not a valid value for threshold. Threshold number must be greater than 1.")
-            return False
+    if leave_number != "" and float(leave_number) > 0:
         if current_members < float(leave_number):
             print("Last attendee in meeting")
             hangup()
             return True
-    else:
-        if 0 < float(leave_percentage) <= 150:
-            if (current_members/total_members)*100 < float(leave_percentage):
-                print("Last attendee in meeting")
-                hangup()
-                return True
-        else:
-          print(leave_percentage+" is not a valid value for threshold. Threshold percent must be greater than 0 and less than 100.")
-          return False 
+            
+    if leave_percentage != "" and 0 < float(leave_percentage) <= 150:
+        if (current_members/total_members)*100 < float(leave_percentage):
+            print("Last attendee in meeting")
+            hangup()
+            return True 
 
     return False 
 
@@ -549,31 +542,31 @@ def main():
     browser.get("https://teams.microsoft.com")
 
     if config['email'] != "" and config['password'] != "":
-        login_email = wait_until_found("input[type='email']", 30)
+        login_email = wait_until_found("input[type='email']")
         if login_email is not None:
             login_email.send_keys(config['email'])
 
         # find the element again to avoid StaleElementReferenceException
-        login_email = wait_until_found("input[type='email']", 5)
+        login_email = wait_until_found("input[type='email']")
         if login_email is not None:
             login_email.send_keys(Keys.ENTER)
 
-        login_pwd = wait_until_found("input[type='password']", 10)
+        login_pwd = wait_until_found("input[type='password']")
         if login_pwd is not None:
             login_pwd.send_keys(config['password'])
 
         # find the element again to avoid StaleElementReferenceException
-        login_pwd = wait_until_found("input[type='password']", 5)
+        login_pwd = wait_until_found("input[type='password']")
         if login_pwd is not None:
             login_pwd.send_keys(Keys.ENTER)
 
-        keep_logged_in = wait_until_found("input[id='idBtn_Back']", 5)
+        keep_logged_in = wait_until_found("input[id='idBtn_Back']")
         if keep_logged_in is not None:
             keep_logged_in.click()
         else:
             print("Login Unsuccessful, recheck entries in config.json")
 
-        use_web_instead = wait_until_found(".use-app-lnk", 5, print_error=False)
+        use_web_instead = wait_until_found(".use-app-lnk")
         if use_web_instead is not None:
             use_web_instead.click()
 

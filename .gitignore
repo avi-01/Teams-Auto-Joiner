@@ -200,4 +200,4 @@ dmypy.json
 venv
 .idea/
 debug.log
-config.json
+configuration.json
