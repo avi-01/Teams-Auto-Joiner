@@ -490,6 +490,17 @@ def hangup():
     if current_meeting is None:
         return
 
+    switch_to_teams_tab()
+    meeting_elems = browser.find_elements_by_css_selector(".one-call")
+    for meeting_elem in meeting_elems:
+        try:
+            meeting_elem.click()
+            break
+        except:
+            continue
+
+    time.sleep(2)
+
     try:
         browser.execute_script("document.getElementById('hangup-button').click()")
 
